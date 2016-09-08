@@ -1,0 +1,30 @@
+0 http://www.purdue.edu
+Learn about Purdue University, a major research university located in Lafayette, Indiana known for discoveries in science, technology, engineering and more. 
+
+1 http://purdue.edu/purdue/academics/
+Academic programs at Purdue prepare students to move the world forward. Explore our colleges, majors and minors.
+
+2 http://purdue.edu/purdue/admissions/
+Find college admissions information including our majors, application requirements, housing and more. Get started on becoming a Boilermaker today!
+
+3 http://purdue.edu/purdue/current_students/
+Find resources for current students such as: Blackboard, dining court menus, important course information and more.
+
+4 http://purdue.edu/purdue/athletics/
+Boiler Up! Explore athletics at Purdue — here you can buy tickets, meet our teams and discover intramural opportunities.
+
+5 http://purdue.edu/purdue/about/
+Explore the history, traditions and achievements of the University and our Boilermakers.
+
+6 http://purdue.edu/purdue/careers/
+Explore the job fairs and other career opportunities that connect Boilermakers with some of the world's best corporations and organizations.
+
+7 http://purdue.edu/purdue/prospective_students/
+Explore resources for prospective students and learn about our academic programs, student life, applying to Purdue, financial aid and more.
+
+8 http://purdue.edu/purdue/research/
+Explore our world-changing research STEM to see why Purdue is a national and global leader in discovery and innovation.
+
+9 http://www.purdue.edu/purdue/commercialization/
+Purdue faculty, staff and students are engaged in entrepreneurship and commercialization, and innovations from Purdue are helping people worldwide.
+

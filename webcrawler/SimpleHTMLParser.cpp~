@@ -1,0 +1,262 @@
+
+#include "SimpleHTMLParser.h"
+#include "openhttp.h"
+#include <string.h>
+
+SimpleHTMLParser::SimpleHTMLParser()
+{
+	
+	dcontent = false;
+	dfound = false;
+
+}
+
+bool
+SimpleHTMLParser::match(char **b, char *m) {
+	int len = strlen(m);
+	if ( !strncasecmp(*b, m, len)) {
+		(*b)+=len;
+		return true;
+	}
+	return false;
+}
+
+bool
+SimpleHTMLParser::parse(char * buffer, int n)
+{
+	enum { START, TAG, SCRIPT, ANCHOR, HREF,
+	       COMMENT, FRAME, SRC, META, DESC, TITLE } state;
+
+	state = START;
+	
+	char * bufferEnd = buffer + n;
+	char * b = buffer;
+	bool lastCharSpace = false;
+	while (b < bufferEnd) {
+		//printf("<%c,%d,%d>", *b, *b,state);
+		switch (state) {
+		case START: {
+			if (match(&b,"<SCRIPT")) {
+				state = SCRIPT;
+			}
+			else if (match(&b,"<!--")) {
+				state = COMMENT;
+			}
+			else if (match(&b,"<A ")) {
+				state = ANCHOR;
+			}
+			else if (match(&b,"<FRAME ")) {
+				state = FRAME;
+			}
+			else if	(match(&b,"<")) {
+				state = TAG;
+			}
+			else if(match(&b,"<META") && !dfound) {
+				state = META;
+			
+			}
+
+			else if(match(&b , "<TITLE>")) {
+
+				state = TITLE;
+				tLength = 0;
+
+			}
+			else {
+				char c = *b;
+				//Substitute one or more blank chars with a single space
+				if (c=='\n'||c=='\r'||c=='\t'||c==' ') {
+					if (!lastCharSpace) {
+						onContentFound(' ');
+					}
+					lastCharSpace = true;
+				}
+				else {
+					onContentFound(c);
+					lastCharSpace = false;
+				}
+				
+				b++;
+			}
+			break;
+		}
+		case ANCHOR: {
+			if (match(&b,"href=\"")) {
+				state = HREF;
+				urlAnchorLength=0;
+				//printf("href=");
+			}
+			else if (match(&b,">")) {
+				// End script
+				state = START;
+			}
+			else {
+				b++;
+			}
+			break;
+				
+		}
+		case HREF: {
+			if (match(&b,"\"")) {
+				// Found ending "
+				state = ANCHOR;
+				urlAnchor[urlAnchorLength] = '\0';
+				onAnchorFound(urlAnchor);
+				//printf("\n");
+			}
+			else {
+				if ( urlAnchorLength < MaxURLLength-1) {
+					urlAnchor[urlAnchorLength] = *b;
+					urlAnchorLength++;
+				}
+				//printf("%c", *b, *b);
+				b++;
+			}
+			break;
+		}
+		case FRAME: {
+			if (match(&b,"src=\"")) {
+				state = SRC;
+				urlAnchorLength=0;
+				//printf("href=");
+			}
+			else if (match(&b,">")) {
+				// End script
+				state = START;
+			}
+			else {
+				b++;
+			}
+			break;
+				
+		}
+		case SRC: {
+			if (match(&b,"\"")) {
+				// Found ending "
+				state = FRAME;
+				urlAnchor[urlAnchorLength] = '\0';
+				onAnchorFound(urlAnchor);
+				//printf("\n");
+			}
+			else {
+				if ( urlAnchorLength < MaxURLLength-1) {
+					urlAnchor[urlAnchorLength] = *b;
+					urlAnchorLength++;
+				}
+				//printf("%c", *b, *b);
+				b++;
+			}
+			break;
+		}
+		case SCRIPT: {
+			if (match(&b,"/SCRIPT>")) {
+				// End script
+				state = START;
+			}
+			else {
+				b++;
+			}
+			break;
+		}
+		case COMMENT: {
+			if (match(&b,"-->")) {
+				// End comments
+				state = START;
+			}
+			else {
+				b++;
+			}
+			break;
+		}
+		case TAG: {
+			if (match(&b, ">")) {
+				state = START;
+			}
+			else {
+				b++;
+			}
+			break;
+		}
+		case META: {
+
+			
+			if(match(&b , "description")) {
+
+				dfound = true;
+
+			}			
+
+
+			if(match(&b,"content=\"")) {
+
+				state = DESC;
+				int desLength = 0;
+
+			}
+
+			else if(match(&b, ">") {
+
+				state = START;
+
+			}
+
+			else {
+
+				b++;
+	
+			}
+
+			break;
+		}
+
+		case DESC: {
+			if (match(&b,"\"")) {
+				// Found ending "
+				state = META;
+				pdes[desLength] = '\0';
+				dcontent = true;
+				//printf("\n");
+			}
+			else {
+				if ( desLength < 2000-1) {
+					pdes[desLength] = *b;
+					desLength++;
+				}
+				//printf("%c", *b, *b);
+				b++;
+			}
+			break;
+		}
+
+		case TITLE: {
+			if (match(&b,"</TITLE>")) {
+				// Found ending <
+				state = START;
+				pdes[tLength] = '\0';
+				//printf("\n");
+			}
+			else {
+				if ( tLength < 200-1) {
+					title[tLength] = *b;
+					tLength++;
+				}
+				//printf("%c", *b, *b);
+				b++;
+			}
+			break;
+		}
+
+		
+		default:;
+		}
+		
+	}
+}
+
+void
+SimpleHTMLParser::onContentFound(char c) {
+}
+
+void
+SimpleHTMLParser::onAnchorFound(char * url) {
+}
